@@ -11,6 +11,19 @@ type block struct {
 	prevHash string
 }
 
+type blockchain struct {
+	blocks []block
+}
+
+func (b *blockchain) addBlock(data string){
+	newBlock := block{data, "", ""}
+	if len(block)
+
+
+}
+
+func (b *blockchain) listBlocks(){}
+
 func main() {
 	genesisBlock := block{
 		data:     "Genesis Block",
@@ -22,4 +35,10 @@ func main() {
 	hexHash := fmt.Sprintf("%x", hash)
 	genesisBlock.hash = hexHash
 	fmt.Println(genesisBlock)
+
+	chain := blockchain{}
+	chain.addBlock("Genesis Block")
+	chain.addBlock("Second Block")
+	chain.addBlock("Third Block")
+	chain.listBlocks()
 }
