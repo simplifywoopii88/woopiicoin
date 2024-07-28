@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/simplifywoopii88/woopiicoin/blockchain"
+	"github.com/simplifywoopii88/woopiicoin/utils"
 )
 
 
@@ -27,6 +30,10 @@ type URLDescription struct {
 	Description string `json:"description"`
 	Payload string `json:"payload,omitempty"`
 }
+
+type AddBlockBody struct {
+	Message string
+}
 func documentation(rw http.ResponseWriter, r *http.Request){
 	data := []URLDescription{
 		{
@@ -39,6 +46,11 @@ func documentation(rw http.ResponseWriter, r *http.Request){
 			Method: "POST",
 			Description: "Add a Block",
 			Payload: "data:string",
+		},
+		{
+			URL: URL("/blocks/{id}"),
+			Method: "GET",
+			Description: "See a Block",
 		},
 	}
 	rw.Header().Add("Content-Type", "application/json")
@@ -55,9 +67,23 @@ func documentation(rw http.ResponseWriter, r *http.Request){
 
 }
 
+func blocks(rw http.ResponseWriter, r *http.Request){
+	switch r.Method {
+	case "GET":
+		rw.Header().Add("Content-Type", "application/json")
+		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
+	case "POST":
+		var addBlockBody AddBlockBody
+		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
+		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
+		rw.WriteHeader(http.StatusCreated)
+	}
+}
+
 func main() {
 
 	http.HandleFunc("/", documentation)
+	http.HandleFunc("/blocks", blocks)
 	fmt.Printf("Listening on http://localhost%s\n", port)
 	log.Fatal(
 		http.ListenAndServe(port, nil),
